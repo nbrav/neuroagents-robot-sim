@@ -11,48 +11,41 @@ Both cases use the same six-axis LEGO-style robot, four target tool poses and re
 
 ## 1. Install
 
-**Use Python 3.11** for the tested dependency versions. No physical robot or EV3 software is needed. A graphical desktop is needed only for the interactive viewer.
+**Use Python 3.11** with the pinned dependencies: MuJoCo 3.17.0 and NumPy 1.26.1. No physical robot or EV3 software is required. The interactive viewer needs a graphical environment; headless comparisons do not.
 
-Download/copy the repository and open a terminal in the directory containing `run.py` and `requirements.txt`. Folder names can contain spaces; quote paths when changing directories. On the original Mac:
+Clone or download this repository, then open a terminal at the **repository root** (where `run.py` and `requirements.txt` are located).
+
+Create and activate an isolated Python 3.11 environment using your preferred environment manager. For example, create a virtual environment with:
 
 ```bash
-cd "$HOME/Desktop/MuJoCo tests"
+python -m venv .venv
 ```
 
-### macOS / Linux
+Activate the environment using your shell's activation command, then install the dependencies:
 
 ```bash
-python3.11 -m venv .venv
-source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-If `python3` already points to Python 3.11, it can replace `python3.11` above. Activate `.venv` again when opening a new terminal. The MuJoCo package includes the physics engine; no separate engine download is required.
-
-### Windows (PowerShell)
-
-```powershell
-py -3.11 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install --upgrade pip
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-```
-
-For the commands below, replace `python` with `.\.venv\Scripts\python.exe` on Windows. This avoids needing to activate the environment.
-
-Dependencies are pinned in `requirements.txt` to the local reference environment: **MuJoCo 3.17.0 and NumPy 1.26.1**. macOS is the locally tested platform; Linux/Windows commands are provided but have not been tested here.
+All commands below use `python` from the activated environment. The MuJoCo package includes the physics engine; no separate engine download is required.
 
 ## 2. Run
 
-From the project directory, with the environment active:
+Run these commands from the repository root:
 
-| Task | macOS | Linux / Windows |
-| --- | --- | --- |
-| Easy viewer | `mjpython run.py easy` | `python run.py easy` |
-| Hard viewer | `mjpython run.py hard` | `python run.py hard` |
-| Compare without a window | `python run.py compare` | `python run.py compare` |
+```bash
+# Easy case: ideal sensing and actuation.
+python run.py easy
 
-**macOS requires `mjpython` for the viewer.** Use ordinary Python for headless runs. Close the viewer window to stop the interactive demo.
+# Hard case: imperfect sensing and actuation, unchanged PD gains.
+python run.py hard
+
+# Compare both cases without a viewer.
+python run.py compare
+```
+
+If the viewer requests MuJoCo's dedicated launcher, use `mjpython run.py easy` or `mjpython run.py hard` instead. Close the viewer window to stop the interactive demo.
 
 In the viewer, yellow marks the desired tool position, RGB axes show its desired orientation, and green marks the actual tool reference. Targets switch every nine simulation seconds, even after a miss. The viewer repeats the sequence; headless runs execute one four-target cycle per case. The fork is fixed and does not open or close.
 
@@ -73,7 +66,7 @@ python run.py hard --headless --seed 7
 python run.py --help
 ```
 
-Use `mjpython run.py hard --csv results/runs/hard.csv` to record an interactive macOS run. CSV output is saved when the run ends, includes completed target intervals only, and replaces an existing file at the supplied path. Close the viewer normally to finish recording.
+Use `python run.py hard --csv results/runs/hard.csv` to record an interactive run; substitute `mjpython` if the viewer requires it. CSV output is saved when the run ends, includes completed target intervals only, and replaces an existing file at the supplied path. Close the viewer normally to finish recording.
 
 ## 3. Files and directories
 
@@ -103,7 +96,7 @@ Use `mjpython run.py hard --csv results/runs/hard.csv` to record an interactive 
 └── .gitignore                     # Excludes environments, caches and new run results
 ```
 
-`__init__.py` files mark Python packages; `robot_models/__init__.py` also locates the XML relative to the project. Move/share the entire folder together. Model paths do not depend on a particular user's Desktop location.
+`__init__.py` files mark Python packages; `robot_models/__init__.py` locates the XML relative to the repository. Keep the repository files together when cloning or downloading.
 
 ## 4. Controller and evaluation
 
@@ -136,10 +129,10 @@ The easy headless case checks accuracy and no contacts. Hard records misses whil
 
 ## Troubleshooting and sharing
 
-- **`mjpython` not found / missing imports:** activate `.venv` and install requirements using that environment's Python.
-- **Viewer fails on macOS:** launch it with `mjpython`; first check physics with `python run.py compare`.
+- **Missing imports or launcher:** activate the project environment and install requirements using that environment's Python.
+- **Viewer launcher error:** try `mjpython` in place of `python`; first check physics with `python run.py compare`.
 - **No graphics available:** use `--headless` or `compare`; they do not open a window.
 - **`No module named controllers` or missing model:** keep the complete directory structure and use the commands from the project root. Run checks with `python -m checks.check_geometry`, not by launching that check file directly.
 - **Different numerical results:** confirm dependency versions and noise seed. Reference results do not guarantee identical floating-point output across platforms.
 
-Share the source directories, documentation, requirements and reference results. Omit `.venv/`, `__pycache__/`, `.DS_Store` and optional `results/runs/` outputs. No remote repository is configured in this folder; clone/publish instructions depend on where the team chooses to host it.
+Share the repository link with teammates. Keep source, documentation, requirements and reference results in version control; exclude local environments, caches and generated `results/runs/` outputs using `.gitignore`. Each teammate installs dependencies in their own environment.
