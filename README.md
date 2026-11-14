@@ -1,4 +1,4 @@
-# NeuroAgents — six-axis robot simulation
+# 🤖 🧠 NeuroAgents — six-axis robot simulation
 
 Compare the same **PD controller with model compensation** under two simulation conditions:
 
